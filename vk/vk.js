@@ -2,20 +2,40 @@ const { vk, logger, cfg, utils, Keyboard, ngrok } = require('../index');
 const keys = require('../modules/keyboard');
 const fs = require('fs');
 const time = require('moment');
+const { url } = require('inspector');
 
 vk.updates.on('message', async (ctx, next)=>{
     if(ctx.peerType == 'chat'){
         if(ctx.peerId != cfg.group.peerId){
             let ad = JSON.parse(fs.readFileSync('./dbs/vk-db/clan-settings.json')).textAd;
-            return ctx.send(ad + '\n@all @all @all');
+            let { link } = JSON.parse(fs.readFileSync('./dbs/vk-db/clan-settings.json'));
+            return ctx.send(ad + '\n@all @all @all', {
+                keyboard: Keyboard.keyboard([
+                    [Keyboard.urlButton({url: link, label: 'Перейти в беседу'}),Keyboard.urlButton({url: link, label: 'Перейти в беседу'})],
+                    [Keyboard.urlButton({url: link, label: 'Перейти в беседу'}),Keyboard.urlButton({url: link, label: 'Перейти в беседу'})],
+                    [Keyboard.urlButton({url: link, label: 'Перейти в беседу'}),Keyboard.urlButton({url: link, label: 'Перейти в беседу'})],
+                    [Keyboard.urlButton({url: link, label: 'Перейти в беседу'}),Keyboard.urlButton({url: link, label: 'Перейти в беседу'})]
+                ])
+            });
         } 
     }
     if(ctx.senderType == 'user'){
         ctx.u = await vk.api.users.get({user_ids: ctx.senderId});
         ctx.u = ctx.u[0];
         if(ctx.peerType == "user"){
+            let chat = await vk.api.messages.getConversationMembers({peer_id: cfg.group.peerId});
+            let userInChat = utils.findOBJ(chat.profiles, 'id', ctx.senderId);
+            let { link } = JSON.parse(fs.readFileSync('./dbs/vk-db/clan-settings.json'));
+            if(!userInChat){
+                ctx.send(`Команды доступны только для участников клановой беседы!`, {
+                    keyboard: Keyboard.keyboard([
+                        Keyboard.urlButton({url: link, label: '🌌 Вступить'})
+                    ]).inline(true)
+                });
+                return 1;
+            } 
             if(ctx.hasForwards){
-                    if(/([\w\W]+), страница [0-9\/?]+:/gim.test(ctx.text)){
+                    if(/([\w\W]+), страница [0-9\/?]+:/gim.test(ctx.forwards[1].text)){
                         return ctx.send(countPetPower(ctx));
                     }
             } else {
@@ -204,13 +224,7 @@ async function lesyaHandler(ctx){
         let battles = JSON.parse(fs.readFileSync('./dbs/vk-db/battles.json'));
         let date = time().format('DD.MM.YYYY');
         if(!battles[date]){
-            battles[date] = {
-                users: [],
-                all: 0,
-                win: 0,
-                lose: 0,
-                norm: clanSettings.norm
-            }
+            return 0;
         }
         let parser = ctx.text.match(/(\[🌌 𝓚𝖔𝝇𝖒𝖔𝝇\] )?([\w\W]+), Ваши питомцы (победили|проиграли)/i);
         parser[2] = parser[2].replace(/\[id[0-9]+\|/gim, '').replace(']', '');
@@ -257,7 +271,7 @@ async function lesyaHandler(ctx){
             message += `😔 Поражений: ${uInfo.lose}\n`
         } else {
             let uIndex = battles[date]['users'].push({
-                nick: info.nick,
+                nick: parser[2],
                 battles: [{
                     enemy: '[*][Бот включился позже]',
                     result: result,
@@ -375,7 +389,7 @@ function countPetPower(ctx){
             }
             stats_message += `Статистика питомцев ${page}:\n`;
             stats_message += `🌀 По Уровню: ${maxLevel.id} ${maxLevel.name} - ${maxLevel.level}\n`;
-            stats_message += `❤ По ХП: ${maxHp.id}] ${maxHp.name} - ${maxHp.hp}\n`;
+            stats_message += `❤ По ХП: ${maxHp.id} ${maxHp.name} - ${maxHp.hp}\n`;
             stats_message += `💢 По Урону: ${maxDamage.id} ${maxDamage.name} - ${maxDamage.damage}\n`;
             stats_message += `🧿 По Магии: ${maxMagic.id} ${maxMagic.name} - ${maxMagic.magic}\n`;
             stats_message += `\n=-=-=-=-=-=-=-=-=-=\n`;
@@ -414,4 +428,3 @@ setInterval(async ()=>{
         }
     }
 }, 5000);
-
