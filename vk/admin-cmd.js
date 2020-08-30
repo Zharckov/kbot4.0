@@ -255,5 +255,5 @@ vk.updates.hear(/^\/setnorm( )?([0-9]{2})?/i, (ctx) => {
     battles[date].norm = clanSettings.norm;
     fs.writeFileSync('./dbs/vk-db/clan-settings.json', JSON.stringify(clanSettings, '', 4));
     fs.writeFileSync('./dbs/vk-db/battles.json', JSON.stringify(battles, '', 4));
-    return ctx.send(`⚙ Норма боев на этот день установлена [${ctx.$match[2]}]`);
+    return ctx.send(`⚙ Норма боев на этот день установлена [${ctx.$match[2]}]\n✊🏻 Теперь бои регистрируются!`);
 });

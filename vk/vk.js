@@ -173,13 +173,7 @@ async function lesyaHandler(ctx){
             enemy: parseInfo[3]
         }
         if(!battles[date]){
-            battles[date] = {
-                users: [],
-                all: 0,
-                win: 0,
-                lose: 0,
-                norm: clanSettings.norm
-            }
+            return 0;
         }
         let user = utils.findOBJ(battles[date]['users'], 'nick', info.nick);
         if(!user){
