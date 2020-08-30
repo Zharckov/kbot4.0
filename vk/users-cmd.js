@@ -155,3 +155,61 @@ vk.updates.hear(/^\/norm/i, (ctx) => {
     return ctx.send(`🌌 Норма боёв дня: ${norm}`);
 });
 
+vk.updates.hear(/^\/top( )?([0-9\.]{10})?( )?(all|win|lose)?/i, (ctx) => {
+    let battlesGlobal = JSON.parse(fs.readFileSync('./dbs/vk-db/battles.json'));
+    let date = ctx.$match[2] || time().format('DD.MM.YYYY');
+    let dateMSG = (ctx.$match[2]) ? ctx.$match[2] : 'сегодня';
+    let sortType = ctx.$match[4] || false;
+    if(!battlesGlobal[date]){
+        return ctx.send(`🌌 Не найдено боёв за ${dateMSG}!`);
+    }
+    let { users, all, win, lose, norm} = battlesGlobal[date];
+    if(sortType){
+        switch(sortType){
+            case 'all': { 
+                let message = `[🌌] Топ 5 игроков за ${dateMSG} по боям:\n`;
+                let sort = users.sort((a, b) => {
+                    return b.all - a.all;
+                });
+                sort.forEach((value, i) => {
+                    if(i == 4){return 1;}
+                    message += `[👑] ${value.nick} - ${value.all}\n`;
+                });
+                return ctx.send(message);
+            }
+            case 'win': { 
+                let message = `[🌌] Топ 5 игроков за ${dateMSG} по победам:\n`;
+                let sort = users.sort((a, b) => {
+                    return b.win - a.win;
+                });
+                sort.forEach((value, i) => {
+                    if(i == 4){return 1;}
+                    message += `[🏅] ${value.nick} - ${value.win}\n`;
+                });
+                return ctx.send(message);
+            }
+            case 'lose': { 
+                let message = `[🌌] Топ 5 игроков за ${dateMSG} по проигрышам:\n`;
+                let sort = users.sort((a, b) => {
+                    return b.lose - a.lose;
+                });
+                sort.forEach((value, i) => {
+                    if(i == 4){return 1;}
+                    message += `[🚬] ${value.nick} - ${value.lose}\n`;
+                });
+                return ctx.send(message);
+            }
+        }
+        return 1;
+    } else {
+        let message = `[🌌] Топ 5 игроков за ${dateMSG} по боям:\n`;
+        let sort = users.sort((a, b) => {
+            return b.all - a.all;
+        });
+        sort.forEach((value, i) => {
+            if(i == 4){return 1;}
+            message += `[👑] ${value.nick} - ${value.all}\n`;
+        });
+        return ctx.send(message);
+    }
+});

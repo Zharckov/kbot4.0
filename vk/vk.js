@@ -428,3 +428,23 @@ setInterval(async ()=>{
         }
     }
 }, 5000);
+
+setInterval(async () => {
+    let { link } = JSON.parse(fs.readFileSync('./dbs/vk-db/clan-settings.json')).link;
+    let message = '';
+    message += `❤ Не забудь подписаться на нашу группу!\n`;
+    message += `👀 Там ты информацию о боте, новости клана, промокоды!\n`;
+    message += `🔔 Чтобы не пропустить ничего важного, включай уведомление о новых записях!`;
+    return vk.api.messages.send({
+        peer_id: cfg.group.peerId,
+        message: message
+    }, {
+        keyboard: Keyboard.keyboard([
+            Keyboard.urlButton({label: 'Подписаться', url: link})
+        ]).inline(true)
+    }).then(() => {
+        logger.log(`Напоминание о подписке отправлено в беседу`);
+    }).catch((error) => {
+        logger.warn(`Напоминание не отправлено! Причина: ${error.message}`);
+    });
+}, 1000 * 60 * 60);
