@@ -122,7 +122,7 @@ vk.updates.hear(/\/new( )?(delete)?( )?([0-9]+)?/i, (ctx) => {
     }
 });
 
-vk.updates.hear(/\/check/i, (ctx) => {
+vk.updates.hear(/\/check/i, async (ctx) => {
     if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);};
     let uptime = utils.formatUptime(process.uptime());
     let used = Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 100) / 100 + ' Мб';
@@ -137,6 +137,7 @@ vk.updates.hear(/\/check/i, (ctx) => {
     message += `> EXT: ${ext}\n\n`;
     message += `> OSMF: ${Math.round(os.freemem() / 1024 / 1024 / 1024 * 100) / 100} Гб\n`;
     message += `> OSMT: ${Math.round(os.totalmem() / 1024 / 1024 / 1024 * 100) / 100} Гб\n`;
+
     return ctx.send(message);
 });
 

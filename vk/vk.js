@@ -2,52 +2,55 @@ const { vk, logger, cfg, utils, Keyboard, ngrok } = require('../index');
 const keys = require('../modules/keyboard');
 const fs = require('fs');
 const time = require('moment');
-const { url } = require('inspector');
 
 vk.updates.on('message', async (ctx, next)=>{
-    if(ctx.peerType == 'chat'){
-        if(ctx.peerId != cfg.group.peerId){
-            let ad = JSON.parse(fs.readFileSync('./dbs/vk-db/clan-settings.json')).textAd;
-            let { link } = JSON.parse(fs.readFileSync('./dbs/vk-db/clan-settings.json'));
-            return ctx.send(ad + '\n@all @all @all', {
-                keyboard: Keyboard.keyboard([
-                    [Keyboard.urlButton({url: link, label: 'Перейти в беседу'}),Keyboard.urlButton({url: link, label: 'Перейти в беседу'})],
-                    [Keyboard.urlButton({url: link, label: 'Перейти в беседу'}),Keyboard.urlButton({url: link, label: 'Перейти в беседу'})],
-                    [Keyboard.urlButton({url: link, label: 'Перейти в беседу'}),Keyboard.urlButton({url: link, label: 'Перейти в беседу'})],
-                    [Keyboard.urlButton({url: link, label: 'Перейти в беседу'}),Keyboard.urlButton({url: link, label: 'Перейти в беседу'})]
-                ])
-            });
-        } 
-    }
-    if(ctx.senderType == 'user'){
-        ctx.u = await vk.api.users.get({user_ids: ctx.senderId});
-        ctx.u = ctx.u[0];
-        if(ctx.peerType == "user"){
-            let chat = await vk.api.messages.getConversationMembers({peer_id: cfg.group.peerId});
-            let userInChat = utils.findOBJ(chat.profiles, 'id', ctx.senderId);
-            let { link } = JSON.parse(fs.readFileSync('./dbs/vk-db/clan-settings.json'));
-            if(!userInChat){
-                ctx.send(`Команды доступны только для участников клановой беседы!`, {
+    try{
+        if(ctx.peerType == 'chat'){
+            if(ctx.peerId != cfg.group.peerId){
+                let ad = JSON.parse(fs.readFileSync('./dbs/vk-db/clan-settings.json')).textAd;
+                let { link } = JSON.parse(fs.readFileSync('./dbs/vk-db/clan-settings.json'));
+                return ctx.send(ad + '\n@all @all @all', {
                     keyboard: Keyboard.keyboard([
-                        Keyboard.urlButton({url: link, label: '🌌 Вступить'})
-                    ]).inline(true)
+                        [Keyboard.urlButton({url: link, label: 'Перейти в беседу'}),Keyboard.urlButton({url: link, label: 'Перейти в беседу'})],
+                        [Keyboard.urlButton({url: link, label: 'Перейти в беседу'}),Keyboard.urlButton({url: link, label: 'Перейти в беседу'})],
+                        [Keyboard.urlButton({url: link, label: 'Перейти в беседу'}),Keyboard.urlButton({url: link, label: 'Перейти в беседу'})],
+                        [Keyboard.urlButton({url: link, label: 'Перейти в беседу'}),Keyboard.urlButton({url: link, label: 'Перейти в беседу'})]
+                    ])
                 });
-                return 1;
             } 
-            if(ctx.hasForwards){
-                    if(/([\w\W]+), страница [0-9\/?]+:/gim.test(ctx.forwards[1].text)){
-                        return ctx.send(countPetPower(ctx));
-                    }
-            } else {
-                return next();
+        }
+        if(ctx.senderType == 'user'){
+            ctx.u = await vk.api.users.get({user_ids: ctx.senderId});
+            ctx.u = ctx.u[0];
+            if(ctx.peerType == "user"){
+                let chat = await vk.api.messages.getConversationMembers({peer_id: cfg.group.peerId});
+                let userInChat = utils.findOBJ(chat.profiles, 'id', ctx.senderId);
+                let { link } = JSON.parse(fs.readFileSync('./dbs/vk-db/clan-settings.json'));
+                if(!userInChat){
+                    ctx.send(`Команды доступны только для участников клановой беседы!`, {
+                        keyboard: Keyboard.keyboard([
+                            Keyboard.urlButton({url: link, label: '🌌 Вступить'})
+                        ]).inline(true)
+                    });
+                    return 1;
+                } 
+                if(ctx.hasForwards){
+                        if(/([\w\W]+), страница [0-9\/?]+:/gim.test(ctx.forwards[1].text)){
+                            return ctx.send(countPetPower(ctx));
+                        }
+                } else {
+                    return next();
+                }
+            }
+            return next();
+        } 
+        if(ctx.senderType == 'group'){
+            if(cfg.group.lesyaId == ctx.senderId){
+                return lesyaHandler(ctx);
             }
         }
-        return next();
-    } 
-    if(ctx.senderType == 'group'){
-        if(cfg.group.lesyaId == ctx.senderId){
-            return lesyaHandler(ctx);
-        }
+    } catch(e){
+        return logger.error(`Ошибка проверки наличия пользователя в беседе: ${e.message}`);
     }
 });
 
@@ -403,29 +406,33 @@ function divideNumber(x) {
 }
 
 setInterval(async ()=>{
-    let { profiles } = await vk.api.messages.getConversationMembers({peer_id: cfg.group.peerId});
-    let new_users = JSON.parse(fs.readFileSync('./dbs/vk-db/new-users.json'));
-    for(let i = 0; i < profiles.length; i++){
-        let user = utils.findOBJ(new_users, 'id', profiles[i].id);
-        if(user && user.el.kickTime <= new Date().getTime()){
-            vk.api.messages.send({
-                peer_id: cfg.group.peerId,
-                message: `[id${user.el.id}|${user.el.name}], вы не успели войти в клан!`
-            });
-            vk.api.messages.removeChatUser({
-                chat_id: cfg.group.chatId,
-                member_id: user.el.id
-            });
-            new_users.splice(user.ind, 1);
-            fs.writeFileSync('./dbs/vk-db/new-users.json', JSON.stringify(new_users, '', 4));
+    try {
+        let { profiles } = await vk.api.messages.getConversationMembers({peer_id: cfg.group.peerId});
+        let new_users = JSON.parse(fs.readFileSync('./dbs/vk-db/new-users.json'));
+        for(let i = 0; i < profiles.length; i++){
+            let user = utils.findOBJ(new_users, 'id', profiles[i].id);
+            if(user && user.el.kickTime <= new Date().getTime()){
+                vk.api.messages.send({
+                    peer_id: cfg.group.peerId,
+                    message: `[id${user.el.id}|${user.el.name}], вы не успели войти в клан!`
+                });
+                vk.api.messages.removeChatUser({
+                    chat_id: cfg.group.chatId,
+                    member_id: user.el.id
+                });
+                new_users.splice(user.ind, 1);
+                fs.writeFileSync('./dbs/vk-db/new-users.json', JSON.stringify(new_users, '', 4));
+            }
         }
-    }
-    for(let i = 0; i < new_users.length; i++){
-        let user = utils.findOBJ(profiles, 'id', new_users[i].id);
-        if(!user){
-            new_users.splice(i, 1);
-            fs.writeFileSync('./dbs/vk-db/new-users.json', JSON.stringify(new_users, '', 4));
+        for(let i = 0; i < new_users.length; i++){
+            let user = utils.findOBJ(profiles, 'id', new_users[i].id);
+            if(!user){
+                new_users.splice(i, 1);
+                fs.writeFileSync('./dbs/vk-db/new-users.json', JSON.stringify(new_users, '', 4));
+            }
         }
+    } catch(error){
+        logger.error(`Ошибка проверки new-users.json: ${error.message}`);
     }
 }, 5000);
 
@@ -437,8 +444,7 @@ setInterval(async () => {
     message += `🔔 Чтобы не пропустить ничего важного, включай уведомление о новых записях!`;
     return vk.api.messages.send({
         peer_id: cfg.group.peerId,
-        message: message
-    }, {
+        message: message,
         keyboard: Keyboard.keyboard([
             Keyboard.urlButton({label: 'Подписаться', url: link})
         ]).inline(true)

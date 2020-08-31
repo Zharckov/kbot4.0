@@ -151,8 +151,10 @@ vk.updates.hear(/^\/mybattle( )?([0-9\.]{10})?( )?([1-9]+)?/i, (ctx) => {
 });
 
 vk.updates.hear(/^\/norm/i, (ctx) => {
-    let norm = JSON.parse(fs.readFileSync('./dbs/vk-db/clan-settings.json')).norm;
-    return ctx.send(`🌌 Норма боёв дня: ${norm}`);
+    let battles = JSON.parse(fs.readFileSync('./dbs/vk-db/battles.json'));
+    let date = time().format('DD.MM.YYYY');
+    if(!battles[date]){return ctx.send(`🌌 Норма боёв не установлена!`);}
+    return ctx.send(`🌌 Норма боев на сегодня: ${battles[date].norm}`);
 });
 
 vk.updates.hear(/^\/top( )?([0-9\.]{10})?( )?(all|win|lose)?/i, (ctx) => {
