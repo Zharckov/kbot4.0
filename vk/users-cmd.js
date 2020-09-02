@@ -1,6 +1,7 @@
 const { vk, logger, cfg } = require('./vk');
 const fs = require('fs');
 const time = require('moment');
+const countdown = require('countdown');
 
 let ARRAY_CMD = require('../dbs/vk-db/cmds.json');
 const utils = require('../modules/utils');
@@ -135,8 +136,8 @@ vk.updates.hear(/^\/mybattle( )?([0-9\.]{10})?( )?([1-9]+)?/i, (ctx) => {
                     let { enemy, result, end, start } = player.el.battles[ctx.$match[4]];
                     message += `😈 Противник: ${enemy}\n`;
                     message += `⚔ Начало: ${start}\n`;    
-                    message += `🚬 Конец: ${end}\n`; 
-                    message += `🏅 Результат: ${result}\n`;
+                    message += `🚬 Конец: ${(!end) ? 'Идет бой...' : end}\n`; 
+                    message += `🏅 Результат: ${(!result) ? 'Идет бой...' : result}\n`;
                     return ctx.send(message);   
                 } else {
                     return ctx.send(`❗❗ Бой с укзанным номером не найден!`)
@@ -215,3 +216,27 @@ vk.updates.hear(/^\/top( )?([0-9\.]{10})?( )?(all|win|lose)?/i, (ctx) => {
         return ctx.send(message);
     }
 });
+
+vk.updates.hear(/^\/summer/i, (ctx) => {
+    let message = `🌌 До лета осталось:\n`;
+    let date = countdown(time(), new Date('2021/06/01'));
+    message += `🌕 Месяцев: ${date.months}\n`;
+    message += `🔥 Дней: ${date.days}\n`;
+    message += `🍎 Часов: ${date.hours}\n`;
+    message += `🍓 Минут: ${date.minutes}\n`;
+    message += `🍉 секунд: ${date.seconds}`;
+    return ctx.send(message);
+});
+
+vk.updates.hear(/^\/2021/i, (ctx) => {
+    let message = `🌌 До 2021 года осталось:\n`;
+    let date = countdown(time(), new Date('2021/01/01'));
+    message += `🌑 Месяцев: ${date.months}\n`;
+    message += `🌨 Дней: ${date.days}\n`;
+    message += `❄ Часов: ${date.hours}\n`;
+    message += `🥗 Минут: ${date.minutes}\n`;
+    message += `🍊 секунд: ${date.seconds}`;
+    return ctx.send(message);
+});
+
+vk.updates.hear(/^\/profile/i, (ctx) => {});

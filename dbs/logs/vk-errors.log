@@ -1,0 +1,17 @@
+Testing
+[09:15:33, 02.09.2020] | [vk] >> Ошибка проверки new-users.json: request to https://api.vk.com/method/messages.getConversationMembers failed, reason: connect ECONNREFUSED 87.240.190.70:443
+[09:15:45, 02.09.2020] | [vk] >> Ошибка проверки new-users.json: request to https://api.vk.com/method/messages.getConversationMembers failed, reason: connect ECONNREFUSED 87.240.190.70:443
+[09:15:55, 02.09.2020] | [vk] >> Ошибка проверки new-users.json: request to https://api.vk.com/method/messages.getConversationMembers failed, reason: connect ECONNREFUSED 87.240.190.70:443
+[09:16:05, 02.09.2020] | [vk] >> Ошибка проверки new-users.json: request to https://api.vk.com/method/messages.getConversationMembers failed, reason: connect ECONNREFUSED 87.240.190.70:443
+[11:45:40, 02.09.2020] | [vk] >> Ошибка проверки new-users.json: request to https://api.vk.com/method/messages.getConversationMembers failed, reason: connect ECONNREFUSED 192.168.0.1:443
+[11:45:52, 02.09.2020] | [vk] >> Ошибка проверки new-users.json: request to https://api.vk.com/method/messages.getConversationMembers failed, reason: connect ECONNREFUSED 192.168.0.1:443
+[11:46:02, 02.09.2020] | [vk] >> Ошибка проверки new-users.json: request to https://api.vk.com/method/messages.getConversationMembers failed, reason: connect ECONNREFUSED 192.168.0.1:443
+[18:23:08, 02.09.2020] | [vk] >> Ошибка проверки new-users.json: request to https://api.vk.com/method/messages.getConversationMembers failed, reason: connect ECONNREFUSED 87.240.139.193:443
+[18:23:20, 02.09.2020] | [vk] >> Ошибка проверки new-users.json: request to https://api.vk.com/method/messages.getConversationMembers failed, reason: connect ECONNREFUSED 87.240.139.193:443
+[18:23:30, 02.09.2020] | [vk] >> Ошибка проверки new-users.json: request to https://api.vk.com/method/messages.getConversationMembers failed, reason: connect ECONNREFUSED 87.240.139.193:443
+[18:23:54, 02.09.2020] | [vk] >> Ошибка проверки new-users.json: network timeout at: https://api.vk.com/method/messages.getConversationMembers
+[20:53:24, 02.09.2020] | [vk] >> Premium Not Started >> request to https://api.vk.com/method/groups.getById failed, reason: connect ECONNREFUSED 192.168.0.1:443
+[20:53:24, 02.09.2020] | [vk] >> VK Not Started >> request to https://api.vk.com/method/groups.getById failed, reason: connect ECONNREFUSED 192.168.0.1:443
+[20:53:24, 02.09.2020] | [vk] >> Creator Not Started >> request to https://api.vk.com/method/groups.getById failed, reason: connect ECONNREFUSED 192.168.0.1:443
+[20:53:33, 02.09.2020] | [vk] >> Ошибка проверки new-users.json: request to https://api.vk.com/method/messages.getConversationMembers failed, reason: connect ECONNREFUSED 192.168.0.1:443
+[20:53:57, 02.09.2020] | [vk] >> Ошибка проверки new-users.json: request to https://api.vk.com/method/messages.getConversationMembers failed, reason: getaddrinfo ENOTFOUND api.vk.com

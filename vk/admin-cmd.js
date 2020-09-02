@@ -243,18 +243,102 @@ vk.updates.hear(/^\/setnorm( )?([0-9]{2})?/i, (ctx) => {
     let clanSettings = JSON.parse(fs.readFileSync('./dbs/vk-db/clan-settings.json'));
     let battles = JSON.parse(fs.readFileSync('./dbs/vk-db/battles.json'));
     let date = time().format('DD.MM.YYYY');
-    clanSettings.norm = ctx.$match[2];
+    clanSettings.norm = Number(ctx.$match[2]);
     if(!battles[date]){
         battles[date] = {
             users: [],
             all: 0,
             win: 0,
             lose: 0,
-            norm: clanSettings.norm
+            norm: Number(clanSettings.norm)
         }
     } 
-    battles[date].norm = clanSettings.norm;
+    battles[date].norm = Number(clanSettings.norm);
     fs.writeFileSync('./dbs/vk-db/clan-settings.json', JSON.stringify(clanSettings, '', 4));
     fs.writeFileSync('./dbs/vk-db/battles.json', JSON.stringify(battles, '', 4));
     return ctx.send(`⚙ Норма боев на этот день установлена [${ctx.$match[2]}]\n✊🏻 Теперь бои регистрируются!`);
+});
+
+vk.updates.hear(/^\/players/i, async (ctx) => {
+    if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);}
+    let users = JSON.parse(fs.readFileSync('./dbs/vk-db/users.json'));
+    let message = `🌌 Зарегистрованы в боте:\n`;
+    for(let i = 0; i < users.length; i++){
+        let user = await vk.api.users.get({user_ids: users[i].id});
+        message += `>> ${user[0].first_name} ${user[0].last_name} | ${users[i].nick} | ${users[i].lid}\n`;
+    }
+    return ctx.send(message);
+});
+
+vk.updates.hear(/\/logs( )?(vk|app|http)?/i, async (ctx) => {
+    if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);}
+    if(!ctx.$match[2]){return ctx.send(`❗ Использовать: /logs vk | app | http`);}
+    switch(ctx.$match[2]){
+        case 'vk':{
+            let logs = await vk.upload.messageDocument({
+                peer_id: ctx.peerId, 
+                source: './dbs/logs/vk-logs.log',
+                title: 'vk-logs.log'
+            }).catch((error) => {logger.error(`1) Отправка логов: ${error.message}`)});
+            let errors = await vk.upload.messageDocument({
+                peer_id: ctx.peerId, 
+                source: './dbs/logs/vk-errors.log',
+                title: 'vk-errors.log'
+            }).catch((error) => {logger.error(`2) Отправка логов: ${error.message}`)});
+            let warns = await vk.upload.messageDocument({
+                peer_id: ctx.peerId, 
+                source: './dbs/logs/vk-warns.log',
+                title: 'vk-warns.log'
+            }).catch((error) => {logger.error(`3) Отправка логов: ${error.message}`)});
+            return vk.api.messages.send({
+                peer_id: ctx.peerId,
+                attachment: [logs.toString(), errors.toString(), warns.toString()]
+            });
+        }
+        case 'app':{
+            let logs = await vk.upload.messageDocument({
+                peer_id: ctx.peerId, 
+                source: './dbs/logs/app-logs.log',
+                title: `app-logs.log`
+            }).catch((error) => {logger.error(`1) Отправка логов: ${error.message}`)});;
+            let errors = await vk.upload.messageDocument({
+                peer_id: ctx.peerId, 
+                source: './dbs/logs/app-errors.log',
+                title: `app-erros.log`
+            }).catch((error) => {logger.error(`2) Отправка логов: ${error.message}`)});;
+            let warns = await vk.upload.messageDocument({
+                peer_id: ctx.peerId, 
+                source: './dbs/logs/app-warns.log',
+                title: `app-warns.log`
+            }).catch((error) => {logger.error(`3) Отправка логов: ${error.message}`)});;
+            return vk.api.messages.send({
+                peer_id: ctx.peerId,
+                attachment: [logs.toString(), errors.toString(), warns.toString()]
+            });
+        }
+        case 'http':{
+            let logs = await vk.upload.messageDocument({
+                peer_id: ctx.peerId,
+                source: './dbs/logs/http-logs.log',
+                title: 'http-logs.log'
+            });
+            let errors = await vk.upload.messageDocument({
+                peer_id: ctx.peerId,
+                source: './dbs/logs/http-errors.log',
+                title: 'http-errors.log'
+            });
+            let warns = await vk.upload.messageDocument({
+                peer_id: ctx.peerId,
+                source: './dbs/logs/http-warns.log',
+                title: 'http-warns.log'
+            });
+            return vk.api.messages.send({
+                peer_id: ctx.peerId,
+                attachment: [logs.toString(), errors.toString(), warns.toString()]
+            });
+        }
+        default: {
+            return ctx.send(`❗ Использовать: /logs vk | app | http`);
+        }
+    }
 });

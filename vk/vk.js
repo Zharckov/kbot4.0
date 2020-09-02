@@ -22,6 +22,7 @@ vk.updates.on('message', async (ctx, next)=>{
         if(ctx.senderType == 'user'){
             ctx.u = await vk.api.users.get({user_ids: ctx.senderId});
             ctx.u = ctx.u[0];
+            logger.debug(`${ctx.u.first_name} ${ctx.u.last_name}: ${ctx.text}`);
             if(ctx.peerType == "user"){
                 let chat = await vk.api.messages.getConversationMembers({peer_id: cfg.group.peerId});
                 let userInChat = utils.findOBJ(chat.profiles, 'id', ctx.senderId);
@@ -50,7 +51,7 @@ vk.updates.on('message', async (ctx, next)=>{
             }
         }
     } catch(e){
-        return logger.error(`Ошибка проверки наличия пользователя в беседе: ${e.message}`);
+        return logger.error(`Ошибка [on('message')]: ${e.message}`);
     }
 });
 
@@ -432,12 +433,12 @@ setInterval(async ()=>{
             }
         }
     } catch(error){
-        logger.error(`Ошибка проверки new-users.json: ${error.message}`);
+        logger.error(`Ошибка проверки new-users.json: ${error.message}`, 'vk');
     }
-}, 5000);
+}, 10000);
 
 setInterval(async () => {
-    let { link } = JSON.parse(fs.readFileSync('./dbs/vk-db/clan-settings.json')).link;
+    let { link } = JSON.parse(fs.readFileSync('./dbs/vk-db/clan-settings.json'));
     let message = '';
     message += `❤ Не забудь подписаться на нашу группу!\n`;
     message += `👀 Там ты информацию о боте, новости клана, промокоды!\n`;
@@ -449,8 +450,8 @@ setInterval(async () => {
             Keyboard.urlButton({label: 'Подписаться', url: link})
         ]).inline(true)
     }).then(() => {
-        logger.log(`Напоминание о подписке отправлено в беседу`);
+        logger.log(`Напоминание о подписке отправлено в беседу`, 'vk');
     }).catch((error) => {
-        logger.warn(`Напоминание не отправлено! Причина: ${error.message}`);
+        logger.warn(`Напоминание не отправлено! Причина: ${error.message}`, 'vk');
     });
 }, 1000 * 60 * 60);
