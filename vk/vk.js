@@ -3,6 +3,21 @@ const keys = require('../modules/keyboard');
 const fs = require('fs');
 const time = require('moment');
 
+let contoller = JSON.parse(fs.readFileSync('./dbs/server-db/controller.json'));
+console.log(contoller)
+if(contoller.isRestarted){
+    vk.api.messages.send({
+        peer_id: cfg.group.peerId,
+        message: '🌌 Я перезагрузился!'
+    }).then((data) => {
+        logger.log(`Успешная перезагрузка`, 'app');
+    }).catch((e) => {
+        logger.error(`Сообщение перезагрузки не отправлено: ${e.message}`, 'vk');
+    });
+    contoller.isRestarted = false;
+    fs.writeFileSync('./dbs/server-db/controller.json', JSON.stringify(contoller, '', 4));
+}
+
 vk.updates.on('message', async (ctx, next)=>{
     try{
         if(ctx.peerType == 'chat'){

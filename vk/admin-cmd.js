@@ -2,6 +2,7 @@ const { vk, logger, cfg, utils, Keyboard, ngrok, keys } = require('./vk');
 const fs = require('fs');
 const os = require('os');
 const time = require('moment');
+const { exec } = require('child_process');
 
 vk.updates.hear(/\/stuff( )(add|delete)/i, async (ctx) => {
     if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);};
@@ -341,4 +342,13 @@ vk.updates.hear(/\/logs( )?(vk|app|http)?/i, async (ctx) => {
             return ctx.send(`❗ Использовать: /logs vk | app | http`);
         }
     }
+});
+
+vk.updates.hear(/\/restart/i, (ctx) => {
+    let data = JSON.parse(fs.readFileSync('./dbs/server-db/controller.json'));
+    data.isRestarted = true;
+    fs.writeFileSync('./dbs/server-db/controller.json', JSON.stringify(data, '', 4));
+    ctx.send(`🌌 Начинаю перезагрузку...`);
+    logger.log(`Перезагрузка началась...`, 'app');
+    return exec('pm2 restart 0');
 });
