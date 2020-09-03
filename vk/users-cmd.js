@@ -170,7 +170,7 @@ vk.updates.hear(/^\/top( )?([0-9\.]{10})?( )?(all|win|lose)?/i, (ctx) => {
     if(sortType){
         switch(sortType){
             case 'all': { 
-                let message = `[🌌] Топ 5 игроков за ${dateMSG} по боям:\n`;
+                let message = `[🌌] Топ игроков за ${dateMSG} по боям:\n`;
                 let sort = users.sort((a, b) => {
                     return b.all - a.all;
                 });
@@ -181,7 +181,7 @@ vk.updates.hear(/^\/top( )?([0-9\.]{10})?( )?(all|win|lose)?/i, (ctx) => {
                 return ctx.send(message);
             }
             case 'win': { 
-                let message = `[🌌] Топ 5 игроков за ${dateMSG} по победам:\n`;
+                let message = `[🌌] Топ игроков за ${dateMSG} по победам:\n`;
                 let sort = users.sort((a, b) => {
                     return b.win - a.win;
                 });
@@ -192,7 +192,7 @@ vk.updates.hear(/^\/top( )?([0-9\.]{10})?( )?(all|win|lose)?/i, (ctx) => {
                 return ctx.send(message);
             }
             case 'lose': { 
-                let message = `[🌌] Топ 5 игроков за ${dateMSG} по проигрышам:\n`;
+                let message = `[🌌] Топ игроков за ${dateMSG} по проигрышам:\n`;
                 let sort = users.sort((a, b) => {
                     return b.lose - a.lose;
                 });
@@ -205,10 +205,11 @@ vk.updates.hear(/^\/top( )?([0-9\.]{10})?( )?(all|win|lose)?/i, (ctx) => {
         }
         return 1;
     } else {
-        let message = `[🌌] Топ 5 игроков за ${dateMSG} по боям:\n`;
+        let message = `[🌌] Топ игроков за ${dateMSG} по боям:\n`;
         let sort = users.sort((a, b) => {
             return b.all - a.all;
         });
+        sort.slice(sort.length, 4);
         sort.forEach((value, i) => {
             if(i == 4){return 1;}
             message += `[👑] ${value.nick} - ${value.all}\n`;

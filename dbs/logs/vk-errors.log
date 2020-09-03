@@ -15,3 +15,4 @@ Testing
 [20:53:24, 02.09.2020] | [vk] >> Creator Not Started >> request to https://api.vk.com/method/groups.getById failed, reason: connect ECONNREFUSED 192.168.0.1:443
 [20:53:33, 02.09.2020] | [vk] >> Ошибка проверки new-users.json: request to https://api.vk.com/method/messages.getConversationMembers failed, reason: connect ECONNREFUSED 192.168.0.1:443
 [20:53:57, 02.09.2020] | [vk] >> Ошибка проверки new-users.json: request to https://api.vk.com/method/messages.getConversationMembers failed, reason: getaddrinfo ENOTFOUND api.vk.com
+[08:03:26, 03.09.2020] | [vk] >> Ошибка проверки new-users.json: Code №10 - Internal server error

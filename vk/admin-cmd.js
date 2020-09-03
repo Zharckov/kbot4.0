@@ -186,7 +186,14 @@ vk.updates.hear(/^\/battle( )?([0-9\.]{10})?( )?([1-9]+)?( )?([\w\W]+)?/i, (ctx)
     let date = (ctx.$match[2]) ? ctx.$match[2] : time().format('DD.MM.YYYY');
     let dateMSG = (ctx.$match[2]) ? `${ctx.$match[2]}` : 'сегодня';
     let battlesGlobal = JSON.parse(fs.readFileSync('./dbs/vk-db/battles.json'));
-    if(!battlesGlobal[date]){return ctx.send(`🌌 Боёв за ${dateMSG} не найдено!`);}
+    if(!battlesGlobal[date]){
+        let message = `🌌 Боёв за ${dateMSG} не найдено!\n⚙ Доступные даты:\n`;
+        let dates = Object.keys(battlesGlobal);
+        for(let i = 0; i < dates.length; i++){
+            message += `> ${dates[i]}\n`; 
+        }
+        return ctx.send(message);
+    }
     if(ctx.$match[6]){
         let check = utils.findOBJ(battlesGlobal[date]['users'], 'nick', ctx.$match[6]);
         if(!check){return ctx.send(`🌌 ${ctx.$match[6]} не играл бои ${dateMSG}!`);}

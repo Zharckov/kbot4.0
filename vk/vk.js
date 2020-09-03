@@ -4,7 +4,6 @@ const fs = require('fs');
 const time = require('moment');
 
 let contoller = JSON.parse(fs.readFileSync('./dbs/server-db/controller.json'));
-console.log(contoller)
 if(contoller.isRestarted){
     vk.api.messages.send({
         peer_id: cfg.group.peerId,
