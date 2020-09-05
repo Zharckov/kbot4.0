@@ -1,2 +1,4 @@
 
 [19:32:21, 31.08.2020] | [vk] >> Ошибка установки статуса: request to https://api.vk.com/method/status.set failed, reason: connect ECONNREFUSED 87.240.137.207:443
+[15:15:27, 03.09.2020] | [vk] >> Ошибка установки статуса: request to https://api.vk.com/method/status.set failed, reason: getaddrinfo ENOTFOUND api.vk.com
+[15:25:27, 03.09.2020] | [vk] >> Ошибка установки статуса: request to https://api.vk.com/method/status.set failed, reason: getaddrinfo ENOTFOUND api.vk.com

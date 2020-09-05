@@ -240,4 +240,12 @@ vk.updates.hear(/^\/2021/i, (ctx) => {
     return ctx.send(message);
 });
 
-vk.updates.hear(/^\/profile/i, (ctx) => {});
+vk.updates.hear(/^\/profile/i, (ctx) => {
+    let users = JSON.parse(fs.readFileSync('./dbs/vk-db/users.json'));
+    let { el, ind } = utils.findOBJ(users, 'id', ctx.senderId);
+    if(el){
+        return ctx.send(`🌌 ID: ${ind+1}\n🌌 Ник: ${el.nick}\n🌌 LesyaID: ${el.lid}`);
+    } else {
+        return ctx.send(`🌌 Вы еще не зарегистрированны в боте!\n🌌 Используйте: /reg`);
+    }
+});

@@ -452,7 +452,7 @@ setInterval(async ()=>{
 }, 10000);
 
 setInterval(async () => {
-    let { link } = JSON.parse(fs.readFileSync('./dbs/vk-db/clan-settings.json'));
+    let { glink } = JSON.parse(fs.readFileSync('./dbs/vk-db/clan-settings.json'));
     let message = '';
     message += `❤ Не забудь подписаться на нашу группу!\n`;
     message += `👀 Там ты информацию о боте, новости клана, промокоды!\n`;
@@ -461,7 +461,7 @@ setInterval(async () => {
         peer_id: cfg.group.peerId,
         message: message,
         keyboard: Keyboard.keyboard([
-            Keyboard.urlButton({label: 'Подписаться', url: link})
+            Keyboard.urlButton({label: 'Подписаться', url: glink})
         ]).inline(true)
     }).then(() => {
         logger.log(`Напоминание о подписке отправлено в беседу`, 'vk');
