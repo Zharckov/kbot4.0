@@ -44,10 +44,11 @@ function addAdmin(id, name){
 }
 
 function delAdmin(id){
-    let admins = JSON.parse(fs.readFileSync('./dbs/server-db/admins.json'));
+    let admins = JSON.parse(fs.readFileSync(`${__dirname}/../dbs/server-db/admins.json`));
     let info = findOBJ(admins, 'id', id);
     if(info){
         admins.splice(info.ind, 1);
+        fs.writeFileSync(`${__dirname}/../dbs/server-db/admins.json`, JSON.stringify(admins, '', 4));
         return 1;
     } else {
         return 0;
