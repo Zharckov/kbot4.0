@@ -4,3 +4,4 @@
 [15:25:27, 03.09.2020] | [vk] >> Ошибка установки статуса: request to https://api.vk.com/method/status.set failed, reason: getaddrinfo ENOTFOUND api.vk.com
 [20:18:51, 07.09.2020] | [vk] >> Ошибка установки статуса: network timeout at: https://api.vk.com/method/status.set
 [08:38:14, 08.09.2020] | [vk] >> Ошибка установки статуса: request to https://api.vk.com/method/status.set failed, reason: getaddrinfo ENOTFOUND api.vk.com
+[14:48:30, 11.09.2020] | [vk] >> Ошибка установки статуса: request to https://api.vk.com/method/status.set failed, reason: getaddrinfo ENOTFOUND api.vk.com
