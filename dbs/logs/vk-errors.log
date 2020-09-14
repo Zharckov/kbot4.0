@@ -307,3 +307,5 @@ Testing
 [14:57:31, 11.09.2020] | [vk] >> Ошибка проверки new-users.json: request to https://api.vk.com/method/messages.getConversationMembers failed, reason: getaddrinfo ENOTFOUND api.vk.com
 [14:57:41, 11.09.2020] | [vk] >> Ошибка проверки new-users.json: request to https://api.vk.com/method/messages.getConversationMembers failed, reason: getaddrinfo ENOTFOUND api.vk.com
 [14:57:51, 11.09.2020] | [vk] >> Ошибка проверки new-users.json: request to https://api.vk.com/method/messages.getConversationMembers failed, reason: getaddrinfo ENOTFOUND api.vk.com
+[00:02:49, 15.09.2020] | [vk] >> Ошибка проверки new-users.json: request to https://api.vk.com/method/messages.getConversationMembers failed, reason: getaddrinfo ENOTFOUND api.vk.com
+[00:02:50, 15.09.2020] | [vk] >> Ошибка проверки new-users.json: request to https://api.vk.com/method/messages.getConversationMembers failed, reason: getaddrinfo ENOTFOUND api.vk.com

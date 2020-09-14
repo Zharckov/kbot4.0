@@ -126,11 +126,14 @@ vk.updates.hear(/\/new( )?(delete)?( )?([0-9]+)?/i, (ctx) => {
 vk.updates.hear(/\/check/i, async (ctx) => {
     if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);};
     let uptime = utils.formatUptime(process.uptime());
+    let info = JSON.parse(fs.readFileSync('./package.json'));
     let used = Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 100) / 100 + ' Мб';
     let total = Math.round(process.memoryUsage().heapTotal / 1024 / 1024 * 100) / 100 + ' Мб';
     let rss = Math.round(process.memoryUsage().rss / 1024 / 1024 * 100) / 100 + ' Мб';
     let ext = Math.round(process.memoryUsage().external / 1024 / 1024 * 100) / 100 + ' Мб';
     let message = `⚙ Статистика бота:\n`;
+    message += `> Version: ${info.version}\n`;
+    message += `> Name: KBot\n\n`;
     message += `> Uptime: ${uptime}\n`;
     message += `> Used: ${used}\n`;
     message += `> Total: ${total}\n`;
