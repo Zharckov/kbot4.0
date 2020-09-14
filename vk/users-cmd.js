@@ -170,14 +170,17 @@ vk.updates.hear(/^\/top( )?([0-9\.]{10})?( )?(all|win|lose)?/i, (ctx) => {
     if(sortType){
         switch(sortType){
             case 'all': { 
-                let message = `[🌌] Топ игроков за ${dateMSG} по боям:\n`;
+                let message = `[🌌] Топ игроков за ${dateMSG} по боям:\n\n`;
                 let sort = users.sort((a, b) => {
                     return b.all - a.all;
                 });
-                sort.forEach((value, i) => {
-                    if(i == 4){return 1;}
-                    message += `[👑] ${value.nick} - ${value.all}\n`;
-                });
+                let sortLength = (sort.length > 5) ? 5 : sort.length;
+                for(let i = 0; i < sortLength; i++){  
+                    if(i <= 2) 
+                        message += `[⚔] ${sort[i].nick} - ${sort[i].all}\n`;
+                    else 
+                        message += `[🗡] ${sort[i].nick} - ${sort[i].all}\n`;
+                }
                 return ctx.send(message);
             }
             case 'win': { 
@@ -185,35 +188,43 @@ vk.updates.hear(/^\/top( )?([0-9\.]{10})?( )?(all|win|lose)?/i, (ctx) => {
                 let sort = users.sort((a, b) => {
                     return b.win - a.win;
                 });
-                sort.forEach((value, i) => {
-                    if(i == 4){return 1;}
-                    message += `[🏅] ${value.nick} - ${value.win}\n`;
-                });
+                let sortLength = (sort.length > 5) ? 5 : sort.length;
+                for(let i = 0; i < sortLength; i++){  
+                    if(i <= 2) 
+                        message += `[👑] ${sort[i].nick} - ${sort[i].win}\n`;
+                    else 
+                        message += `[🏅] ${sort[i].nick} - ${sort[i].win}\n`;
+                }
                 return ctx.send(message);
             }
             case 'lose': { 
-                let message = `[🌌] Топ игроков за ${dateMSG} по проигрышам:\n`;
+                let message = `[🌌] Топ игроков за ${dateMSG} по проигрышам:\n\n`;
                 let sort = users.sort((a, b) => {
                     return b.lose - a.lose;
                 });
-                sort.forEach((value, i) => {
-                    if(i == 4){return 1;}
-                    message += `[🚬] ${value.nick} - ${value.lose}\n`;
-                });
+                let sortLength = (sort.length > 5) ? 5 : sort.length;
+                for(let i = 0; i < sortLength; i++){  
+                    if(i <= 2) 
+                        message += `[🚬] ${sort[i].nick} - ${sort[i].lose}\n`;
+                    else 
+                        message += `[😔] ${sort[i].nick} - ${sort[i].lose}\n`;
+                }
                 return ctx.send(message);
             }
         }
         return 1;
     } else {
-        let message = `[🌌] Топ игроков за ${dateMSG} по боям:\n`;
+        let message = `[🌀] Топ игроков за ${dateMSG} по боям:\n\n`;
         let sort = users.sort((a, b) => {
             return b.all - a.all;
         });
-        sort.slice(sort.length, 4);
-        sort.forEach((value, i) => {
-            if(i == 4){return 1;}
-            message += `[👑] ${value.nick} - ${value.all}\n`;
-        });
+        let sortLength = (sort.length > 5) ? 5 : sort.length;
+        for(let i = 0; i < sortLength; i++){  
+            if(i <= 2) 
+                message += `[⚔] ${sort[i].nick} - ${sort[i].all}\n`;
+            else 
+                message += `[🗡] ${sort[i].nick} - ${sort[i].all}\n`;
+        }
         return ctx.send(message);
     }
 });
@@ -240,12 +251,74 @@ vk.updates.hear(/^\/2021/i, (ctx) => {
     return ctx.send(message);
 });
 
-vk.updates.hear(/^\/profile/i, (ctx) => {
+vk.updates.hear(/^\/kprofile/i, (ctx) => {
     let users = JSON.parse(fs.readFileSync('./dbs/vk-db/users.json'));
     let { el, ind } = utils.findOBJ(users, 'id', ctx.senderId);
+    let battlesGlobal = JSON.parse(fs.readFileSync('./dbs/vk-db/battles.json'));
+    let battlesDateKeys = Object.keys(battlesGlobal);
     if(el){
-        return ctx.send(`🌌 ID: ${ind+1}\n🌌 Ник: ${el.nick}\n🌌 LesyaID: ${el.lid}`);
+        let player = {
+            nick: el.nick,
+            id: el.id,
+            lid: el.lid,
+            win: 0,
+            all: 0,
+            lose: 0,
+            norm: 0,
+            today: {
+                win: 0,
+                lose: 0,
+                all: 0,
+                norm: 'Не выполнена!'
+            }
+        };
+        let message = `🌌 [id${el.id}|${el.nick}], ваш профиль:\n\n`;
+        if(battlesGlobal[time().format('DD.MM.YYYY')]){
+            let find = utils.findOBJ(battlesGlobal[time().format('DD.MM.YYYY')].users, 'nick', el.nick);
+            if(find){
+                player.today.win = find.el.win;
+                player.today.lose = find.el.lose;
+                player.today.all = find.el.all;
+                player.today.norm = (find.el.all >= battlesGlobal[time().format('DD.MM.YYYY')].norm) ? 'Выполнена' : 'Не выполнена'; 
+            } else {
+                player.today.win = `Вы не сыграли ни 1-го боя!`;
+                player.today.lose = `Вы не сыграли ни 1-го боя!`;
+                player.today.all = `Вы не сыграли ни 1-го боя!`;
+                player.today.norm = `Вы не сыграли ни 1-го боя!`;
+            }
+        }
+        for(let i = 0; i < battlesDateKeys.length; i++){
+            let { users, norm } = battlesGlobal[battlesDateKeys[i]];
+            let find = utils.findOBJ(users, 'nick', el.nick);
+            if(find){
+                player.all += find.el.all;
+                player.win += find.el.win;
+                player.lose += find.el.lose;
+                player.norm += (find.el.all >= norm) ? 1 : 0;
+            }
+        }      
+        message += `👤Nick: ${player.nick}\n`;  
+        message += `⚙ ID: ${player.id}\n`;  
+        message += `⚙ LesyaID: ${player.lid}\n`;
+        message += `⚙ Выполнено норм: ${player.norm}\n\n`;  
+        message += `⚔ Всего боёв: ${player.all}\n`;  
+        message += `🏅 Всего побед: ${player.win}\n`;  
+        message += `😔 Всего проигрышей: ${player.lose}\n\n`;  
+        message += `🔥 Боёв сегодня: ${player.today.all}\n`;  
+        message += `🔥 Побед сегодня: ${player.today.win}\n`;  
+        message += `🔥 Проигрышей сегодня: ${player.today.lose}\n`;  
+        message += `🔥 Норма сегодня: ${player.today.norm}\n`;  
+        return ctx.send(message);
     } else {
         return ctx.send(`🌌 Вы еще не зарегистрированны в боте!\n🌌 Используйте: /reg`);
     }
+});
+
+vk.updates.hear(/^\/promo/i, (ctx) => {
+    let codes = JSON.parse(fs.readFileSync('./dbs/vk-db/promocodes.json'));
+    let message = `🌌 Промокоды:\n\n`;
+    for(let i = 0; i < codes.length; i++){
+        message += `🆓 Код: ${codes[i].text}\n&#12288;👤 От: ${codes[i].admin}\n\n`;
+    }
+    return ctx.send(message);
 });

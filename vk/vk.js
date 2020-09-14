@@ -36,7 +36,7 @@ vk.updates.on('message', async (ctx, next)=>{
         if(ctx.senderType == 'user'){
             ctx.u = await vk.api.users.get({user_ids: ctx.senderId});
             ctx.u = ctx.u[0];
-            logger.debug(`${ctx.u.first_name} ${ctx.u.last_name}: ${ctx.text}`);
+            logger.debug(`${ctx.u.first_name} ${ctx.u.last_name}: ${(ctx.text) ? ctx.text : '[Нет текста]'}`);
             if(ctx.peerType == "user"){
                 let chat = await vk.api.messages.getConversationMembers({peer_id: cfg.group.peerId});
                 let userInChat = utils.findOBJ(chat.profiles, 'id', ctx.senderId);
