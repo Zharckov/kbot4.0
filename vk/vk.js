@@ -165,6 +165,9 @@ async function lesyaHandler(ctx){
                 }));
             if(all >= 900000000)
                 message += `&#12288;🔋 Ферм: ${Math.floor(all/900000000)}\n`;
+            if(all >= 5000000000){
+                message += `&#12288;➰ Кармы: ${Math.floor(all/5000000000)}\n`;
+            }
         }
         if(realBitcoin){
             if(realBitcoin >= 28750)

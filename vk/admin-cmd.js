@@ -359,3 +359,18 @@ vk.updates.hear(/\/restart/i, (ctx) => {
     logger.log(`Перезагрузка началась...`, 'app');
     return exec('pm2 restart 0');
 });
+
+vk.updates.hear(/\/sad( )?([\w\W]+)?/i, async (ctx) => {
+    if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);};
+    let message = `👥 Объявление для админов\n`;
+    let members = JSON.parse(fs.readFileSync('./dbs/server-db/admins.json'));
+    let online = 0;
+    for(let i = 0; i < members.length; i++){
+        let user = await vk.api.users.get({user_ids: members[i].id, fields: ['online']});
+        message += `[id${user[0].id}|&#8203;]`;
+        online += (user[0].online) ? 1 : 0;
+    }
+    message += `👥 Онлайн админы: ${online}\n`;
+    message += (ctx.$match[2]) ? `⚠ Объявление: ${ctx.$match[2]}\n` : '⚠ Объявление\n';
+    return ctx.send(message);
+});
