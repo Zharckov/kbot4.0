@@ -1,6 +1,0 @@
-
-[05:14:35, 05.08.2020] | [app] >> NGROK Error >> ENOENT: no such file or directory, open '../dbs/server-db/ngrok.site'
-[21:11:50, 31.08.2020] | [app] >> NGROK Error >> connect ECONNREFUSED 127.0.0.1:4040
-[20:53:10, 02.09.2020] | [app] >> NGROK Error >> connect ECONNREFUSED 127.0.0.1:4040
-[20:49:34, 10.09.2020] | [app] >> NGROK Error >> connect ECONNREFUSED 127.0.0.1:4040
-[00:06:10, 15.09.2020] | [app] >> NGROK Error >> undefined

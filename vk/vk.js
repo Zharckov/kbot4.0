@@ -1,4 +1,4 @@
-const { vk, logger, cfg, utils, Keyboard, ngrok } = require('../index');
+const { vk, logger, cfg, utils, Keyboard } = require('../index');
 const keys = require('../modules/keyboard');
 const fs = require('fs');
 const time = require('moment');
@@ -109,7 +109,7 @@ vk.updates.on('chat_kick_user', async (ctx, next) => {
     return next();
 });
 
-module.exports = { vk, logger, cfg, utils, Keyboard, ngrok, keys }
+module.exports = { vk, logger, cfg, utils, Keyboard, keys }
 
 // ========= CMD ================
 require('./admin-cmd');

@@ -1,4 +1,4 @@
-const { vk, logger, cfg, utils, Keyboard, ngrok, keys } = require('./vk');
+const { vk, logger, cfg, utils, Keyboard, keys } = require('./vk');
 const fs = require('fs');
 const os = require('os');
 const time = require('moment');
@@ -167,21 +167,6 @@ vk.updates.hear(/\/link( )((http(s):\/\/)?vk.me\/join\/[\w\W]+)/i, (ctx) => {
     data.link = new_link;
     fs.writeFileSync('./dbs/vk-db/clan-settings.json', JSON.stringify(data, '', 4));
     return ctx.send(`⚙ Новая ссылка беседы установлена!`);
-});
-
-vk.updates.hear(/\/panel/i, async (ctx) => {
-    if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);};
-    if(!ctx.isFromUser){
-        return ctx.send(`❗ Команду можно использовать только в ЛС боту!`);
-    } else {
-        let data = fs.readFileSync('./dbs/server-db/ngrok.site', 'utf8');
-        let url = await vk.api.utils.getShortLink({
-            url: data
-        });
-        return ctx.send(`🌀 Адрес панели управления:\n🔗 ${url.short_url}`, {
-            dont_parse_links: true
-        });
-    }
 });
 
 vk.updates.hear(/^\/battle( )?([0-9\.]{10})?( )?([1-9]+)?( )?([\w\W]+)?/i, (ctx) => {

@@ -17,14 +17,6 @@ module.exports = {
                 path += 'vk-logs.log';
                 break;
             }
-            case 'app': {
-                path += 'app-logs.log';
-                break;
-            }
-            case 'http': {
-                path += 'http-logs.log';
-                break;
-            }
             default: {
                 return console.log(text);
             }
@@ -41,14 +33,6 @@ module.exports = {
                 path += 'vk-errors.log';
                 break;
             }
-            case 'app': {
-                path += 'app-errors.log';
-                break;
-            }
-            case 'http': {
-                path += 'http-errors.log';
-                break;
-            }
             default: {
                 return console.log(text);
             }
@@ -63,14 +47,6 @@ module.exports = {
         switch(type){
             case 'vk': {
                 path += 'vk-warns.log';
-                break;
-            }
-            case 'app': {
-                path += 'app-warns.log';
-                break;
-            }
-            case 'http': {
-                path += 'http-warns.log';
                 break;
             }
             default: {

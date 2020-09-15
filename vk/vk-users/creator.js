@@ -1,4 +1,4 @@
-const { vk, cfg, logger, ngrok } = require('../vk');
+const { vk, cfg, logger } = require('../vk');
 const { VK, Keyboard } = require('vk-io');
 const utils = require('../../modules/utils');
 const us = new VK({token: cfg.users.creator.token});
