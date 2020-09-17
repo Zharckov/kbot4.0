@@ -140,7 +140,6 @@ vk.updates.hear(/\/new( )?(delete)?( )?([0-9]+)?/i, (ctx) => {
 
 vk.updates.hear(/\/check/i, async (ctx) => {
     if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);};
-
     let uptime = utils.formatUptime(process.uptime());
     let info = JSON.parse(fs.readFileSync('./package.json'));
     let used = Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 100) / 100 + ' Мб';
@@ -283,7 +282,7 @@ vk.updates.hear(/^\/players/i, async (ctx) => {
     return ctx.send(message);
 });
 
-vk.updates.hear(/\/logs( )?(vk|app|http)?/i, async (ctx) => {
+vk.updates.hear(/\/logs( )?(vk)?/i, async (ctx) => {
     if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);}
     if(!ctx.$match[2]){return ctx.send(`❗ Использовать: /logs vk | app | http`);}
     switch(ctx.$match[2]){
@@ -309,46 +308,10 @@ vk.updates.hear(/\/logs( )?(vk|app|http)?/i, async (ctx) => {
             });
         }
         case 'app':{
-            let logs = await vk.upload.messageDocument({
-                peer_id: ctx.peerId, 
-                source: './dbs/logs/app-logs.log',
-                title: `app-logs.log`
-            }).catch((error) => {logger.error(`1) Отправка логов: ${error.message}`)});;
-            let errors = await vk.upload.messageDocument({
-                peer_id: ctx.peerId, 
-                source: './dbs/logs/app-errors.log',
-                title: `app-erros.log`
-            }).catch((error) => {logger.error(`2) Отправка логов: ${error.message}`)});;
-            let warns = await vk.upload.messageDocument({
-                peer_id: ctx.peerId, 
-                source: './dbs/logs/app-warns.log',
-                title: `app-warns.log`
-            }).catch((error) => {logger.error(`3) Отправка логов: ${error.message}`)});;
-            return vk.api.messages.send({
-                peer_id: ctx.peerId,
-                attachment: [logs.toString(), errors.toString(), warns.toString()]
-            });
+            return ctx.send(`❗ Модуль удален!`);
         }
         case 'http':{
-            let logs = await vk.upload.messageDocument({
-                peer_id: ctx.peerId,
-                source: './dbs/logs/http-logs.log',
-                title: 'http-logs.log'
-            });
-            let errors = await vk.upload.messageDocument({
-                peer_id: ctx.peerId,
-                source: './dbs/logs/http-errors.log',
-                title: 'http-errors.log'
-            });
-            let warns = await vk.upload.messageDocument({
-                peer_id: ctx.peerId,
-                source: './dbs/logs/http-warns.log',
-                title: 'http-warns.log'
-            });
-            return vk.api.messages.send({
-                peer_id: ctx.peerId,
-                attachment: [logs.toString(), errors.toString(), warns.toString()]
-            });
+            return ctx.send(`❗ Модуль удален!`);
         }
         default: {
             return ctx.send(`❗ Использовать: /logs vk | app | http`);
