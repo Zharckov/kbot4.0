@@ -191,12 +191,13 @@ async function lesyaHandler(ctx){
 		}
 		let inClan = ctx.text.match(/\[[0-9]+\/50\]/gim);
 		inClan = inClan[0];
-		inClan = inClan.replace('[','').replace('/','').replace('|','').replace('50','').replace(']','');
+        inClan = inClan.replace('[','').replace('/','').replace('|','').replace('50','').replace(']','');
+        inClan = Number(inClan);
 		let chat = await vk.api.messages.getConversationMembers({peer_id: ctx.peerId});
-		// chat.items.length - Кол-во в чате!
-		let isNotClan = (((chat.items.length-3) - inClan) > 0) ? (chat.items.length-3) - inClan : "Нет";
-		let isNotChat = ((inClan - (chat.items.length-3)) > 0) ? inClan - (chat.items.length-3) : "Нет";
-		message += `&#13;\n[💬] Лишних в чате: ${isNotClan}\n[👥] Лишних в клане: ${isNotChat}`;
+        // chat.items.length - Кол-во в чате!
+		let isNotClan = (((chat.profiles.length) - inClan) > 0) ? (chat.profiles.length) - inClan : "Нет";
+		let isNotChat = ((inClan - (chat.profiles.length)) > 0) ? inClan - (chat.profiles.length) : "Нет";
+        message += `&#13;\n[💬] Лишних в чате: ${isNotClan}\n[👥] Лишних в клане: ${isNotChat}`;
 
 		ctx.send(message);
     }

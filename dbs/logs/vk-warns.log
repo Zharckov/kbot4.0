@@ -7,3 +7,4 @@
 [14:48:30, 11.09.2020] | [vk] >> Ошибка установки статуса: request to https://api.vk.com/method/status.set failed, reason: getaddrinfo ENOTFOUND api.vk.com
 [05:16:23, 15.09.2020] | [vk] >> Ошибка установки статуса: request to https://api.vk.com/method/status.set failed, reason: getaddrinfo ENOTFOUND api.vk.com
 [05:16:24, 15.09.2020] | [vk] >> Напоминание не отправлено! Причина: request to https://api.vk.com/method/messages.send failed, reason: getaddrinfo ENOTFOUND api.vk.com
+[08:12:08, 17.09.2020] | [vk] >> Ошибка установки статуса: request to https://api.vk.com/method/status.set failed, reason: getaddrinfo ENOTFOUND api.vk.com

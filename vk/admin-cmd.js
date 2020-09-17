@@ -61,9 +61,24 @@ vk.updates.hear(/\/war/i, async (ctx) => {
     let members = await vk.api.messages.getConversationMembers({
         peer_id: cfg.group.peerId
     });
+    let users = JSON.parse(fs.readFileSync('./dbs/vk-db/users.json'));
     let online = 0;
+    let date = time().format('DD.MM.YYYY');
     for(let i = 0; i < members.profiles.length; i++){
-        message += `[${members.profiles[i].screen_name}|&#8203;]`;
+        let user = utils.findOBJ(users, 'id', members.profiles[i].id);
+        if(user){
+            let battlesGlobal = JSON.parse(fs.readFileSync('./dbs/vk-db/battles.json'));
+            let today = utils.findOBJ(battlesGlobal[date].users, 'nick', user.el.nick);
+            if(today){
+                if(today.el.norm < battlesGlobal[date].norm){
+                    message += `[${members.profiles[i].screen_name}|&#8203;]`;
+                }
+            } else {
+                message += `[${members.profiles[i].screen_name}|&#8203;]`;
+            }
+        } else {
+            message += `[${members.profiles[i].screen_name}|&#8203;]`;
+        }
         if(members.profiles[i].online){
             online++
         }
@@ -125,23 +140,25 @@ vk.updates.hear(/\/new( )?(delete)?( )?([0-9]+)?/i, (ctx) => {
 
 vk.updates.hear(/\/check/i, async (ctx) => {
     if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);};
+
     let uptime = utils.formatUptime(process.uptime());
     let info = JSON.parse(fs.readFileSync('./package.json'));
     let used = Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 100) / 100 + ' Мб';
     let total = Math.round(process.memoryUsage().heapTotal / 1024 / 1024 * 100) / 100 + ' Мб';
     let rss = Math.round(process.memoryUsage().rss / 1024 / 1024 * 100) / 100 + ' Мб';
     let ext = Math.round(process.memoryUsage().external / 1024 / 1024 * 100) / 100 + ' Мб';
+    let ping = (time() - time(ctx.createdAt*1000))/1000;
     let message = `⚙ Статистика бота:\n`;
     message += `> Version: ${info.version}\n`;
     message += `> Name: KBot\n\n`;
     message += `> Uptime: ${uptime}\n`;
+    message += `> Ping: ${ping} сек\n\n`;
     message += `> Used: ${used}\n`;
     message += `> Total: ${total}\n`;
     message += `> RSS: ${rss}\n`;
     message += `> EXT: ${ext}\n\n`;
     message += `> OSMF: ${Math.round(os.freemem() / 1024 / 1024 / 1024 * 100) / 100} Гб\n`;
     message += `> OSMT: ${Math.round(os.totalmem() / 1024 / 1024 / 1024 * 100) / 100} Гб\n`;
-
     return ctx.send(message);
 });
 
