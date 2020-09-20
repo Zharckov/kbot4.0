@@ -472,7 +472,7 @@ setInterval(async () => {
     }).catch((error) => {
         logger.warn(`Напоминание не отправлено! Причина: ${error.message}`, 'vk');
     });
-    
+
     let battles = JSON.parse(fs.readFileSync('./dbs/vk-db/battles.json'));
     if(!battles[time().format('DD.MM.YYYY')]){
         return 1;
