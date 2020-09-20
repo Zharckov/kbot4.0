@@ -240,9 +240,10 @@ vk.updates.hear(/^\/summer/i, (ctx) => {
     return ctx.send(message);
 });
 
-vk.updates.hear(/^\/2021/i, (ctx) => {
-    let message = `🌌 До 2021 года осталось:\n`;
-    let date = countdown(time(), new Date('2021/01/01'));
+vk.updates.hear(/^\/20([0-9]{2})/i, (ctx) => {
+    let message = `🌌 До 20${ctx.$match[1]} года осталось:\n`;
+    let date = countdown(time(), new Date(`20${ctx.$match[1]}/01/01`));
+    message += `🔥 Лет: ${date.years}\n`;
     message += `🌑 Месяцев: ${date.months}\n`;
     message += `🌨 Дней: ${date.days}\n`;
     message += `❄ Часов: ${date.hours}\n`;
@@ -321,4 +322,9 @@ vk.updates.hear(/^\/promo/i, (ctx) => {
         message += `🆓 Код: ${codes[i].text}\n&#12288;👤 От: ${codes[i].admin}\n\n`;
     }
     return ctx.send(message);
+});
+
+vk.updates.hear(/^\/history/i, (ctx) => {
+    let history = fs.readFileSync('./dbs/vk-db/story.txt', {encoding: 'utf8'});
+    return ctx.send(history);
 });

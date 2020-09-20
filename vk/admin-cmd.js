@@ -4,7 +4,7 @@ const os = require('os');
 const time = require('moment');
 const { exec } = require('child_process');
 
-vk.updates.hear(/\/stuff( )(add|delete)/i, async (ctx) => {
+vk.updates.hear(/^\/stuff( )(add|delete)/i, async (ctx) => {
     if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);};
     if(ctx.hasReplyMessage){
         let { replyMessage } = ctx;
@@ -39,7 +39,7 @@ vk.updates.hear(/\/stuff( )(add|delete)/i, async (ctx) => {
     }
 });
 
-vk.updates.hear(/\/ad( )?([\w\W]+)?/i, async (ctx) => {
+vk.updates.hear(/^\/ad( )?([\w\W]+)?/i, async (ctx) => {
     if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);};
     let message = ``;
     let members = await vk.api.messages.getConversationMembers({
@@ -55,8 +55,12 @@ vk.updates.hear(/\/ad( )?([\w\W]+)?/i, async (ctx) => {
     return ctx.send(message);
 });
 
-vk.updates.hear(/\/war/i, async (ctx) => {
+vk.updates.hear(/^\/war/i, async (ctx) => {
     if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);};
+    let battles = JSON.parse(fs.readFileSync('./dbs/vk-db/battles.json'));
+    if(!battles[time().format('DD.MM.YYYY')]){
+        return ctx.send(`❗ Норма не установлена!`);
+    }
     let message = ``;
     let members = await vk.api.messages.getConversationMembers({
         peer_id: cfg.group.peerId
@@ -92,7 +96,7 @@ vk.updates.hear(/\/war/i, async (ctx) => {
     });
 });
 
-vk.updates.hear(/\/rob/i, async (ctx) => {
+vk.updates.hear(/^\/rob/i, async (ctx) => {
     if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);};
     let message = ``;
     let members = await vk.api.messages.getConversationMembers({
@@ -112,7 +116,7 @@ vk.updates.hear(/\/rob/i, async (ctx) => {
     });
 });
 
-vk.updates.hear(/\/new( )?(delete)?( )?([0-9]+)?/i, (ctx) => {
+vk.updates.hear(/^\/new( )?(delete)?( )?([0-9]+)?/i, (ctx) => {
     if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);};
     let new_users = JSON.parse(fs.readFileSync('./dbs/vk-db/new-users.json'));
     if(ctx.$match[2]){
@@ -138,7 +142,7 @@ vk.updates.hear(/\/new( )?(delete)?( )?([0-9]+)?/i, (ctx) => {
     }
 });
 
-vk.updates.hear(/\/check/i, async (ctx) => {
+vk.updates.hear(/^\/check/i, async (ctx) => {
     if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);};
     let uptime = utils.formatUptime(process.uptime());
     let info = JSON.parse(fs.readFileSync('./package.json'));
@@ -147,28 +151,33 @@ vk.updates.hear(/\/check/i, async (ctx) => {
     let rss = Math.round(process.memoryUsage().rss / 1024 / 1024 * 100) / 100 + ' Мб';
     let ext = Math.round(process.memoryUsage().external / 1024 / 1024 * 100) / 100 + ' Мб';
     let ping = (time() - time(ctx.createdAt*1000))/1000;
+    let OSMF = Math.round(os.freemem() / 1024 / 1024 / 1024 * 100) / 100;
+    let OSMT = Math.round(os.totalmem() / 1024 / 1024 / 1024 * 100) / 100;
     let message = `⚙ Статистика бота:\n`;
     message += `> Version: ${info.version}\n`;
     message += `> Name: KBot\n\n`;
+    message += `> Time: ${time().format('HH:mm:ss')}\n`;
+    message += `> Date: ${time().format('DD.MM.YYYY')}\n`;
     message += `> Uptime: ${uptime}\n`;
     message += `> Ping: ${ping} сек\n\n`;
     message += `> Used: ${used}\n`;
     message += `> Total: ${total}\n`;
     message += `> RSS: ${rss}\n`;
     message += `> EXT: ${ext}\n\n`;
-    message += `> OSMF: ${Math.round(os.freemem() / 1024 / 1024 / 1024 * 100) / 100} Гб\n`;
-    message += `> OSMT: ${Math.round(os.totalmem() / 1024 / 1024 / 1024 * 100) / 100} Гб\n`;
+    message += `> OSMU: ${(OSMT - OSMF).toFixed(2)} Гб\n`;
+    message += `> OSMF: ${OSMF} Гб\n`;
+    message += `> OSMT: ${OSMT} Гб\n`;
     return ctx.send(message);
 });
 
-vk.updates.hear(/\/key/i, (ctx) => {
+vk.updates.hear(/^\/key/i, (ctx) => {
     if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);};
     return ctx.send(`🌌 Клавиутура обновлена!`, {
         keyboard: Keyboard.keyboard(keys.chat)
     });
 });
 
-vk.updates.hear(/\/textad( )([\w\W]+)/i, (ctx) => {
+vk.updates.hear(/^\/textad( )([\w\W]+)/i, (ctx) => {
     if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);};
     let data = JSON.parse(fs.readFileSync('./dbs/vk-db/clan-settings.json'));
     data.textAd = ctx.$match[2];
@@ -176,7 +185,7 @@ vk.updates.hear(/\/textad( )([\w\W]+)/i, (ctx) => {
     return ctx.send(`🌌 Текст рекламы изменен!`);
 });
 
-vk.updates.hear(/\/link( )((http(s):\/\/)?vk.me\/join\/[\w\W]+)/i, (ctx) => {
+vk.updates.hear(/^\/link( )((http(s):\/\/)?vk.me\/join\/[\w\W]+)/i, (ctx) => {
     if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);};
     let new_link = ctx.$match[2];
     let data = JSON.parse(fs.readFileSync('./dbs/vk-db/clan-settings.json'));
@@ -282,7 +291,7 @@ vk.updates.hear(/^\/players/i, async (ctx) => {
     return ctx.send(message);
 });
 
-vk.updates.hear(/\/logs( )?(vk)?/i, async (ctx) => {
+vk.updates.hear(/^\/logs( )?(vk)?/i, async (ctx) => {
     if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);}
     if(!ctx.$match[2]){return ctx.send(`❗ Использовать: /logs vk | app | http`);}
     switch(ctx.$match[2]){
@@ -319,7 +328,7 @@ vk.updates.hear(/\/logs( )?(vk)?/i, async (ctx) => {
     }
 });
 
-vk.updates.hear(/\/restart/i, (ctx) => {
+vk.updates.hear(/^\/restart/i, (ctx) => {
     let data = JSON.parse(fs.readFileSync('./dbs/server-db/controller.json'));
     data.isRestarted = true;
     fs.writeFileSync('./dbs/server-db/controller.json', JSON.stringify(data, '', 4));
@@ -328,7 +337,7 @@ vk.updates.hear(/\/restart/i, (ctx) => {
     return exec('pm2 restart 0');
 });
 
-vk.updates.hear(/\/sad( )?([\w\W]+)?/i, async (ctx) => {
+vk.updates.hear(/^\/sad( )?([\w\W]+)?/i, async (ctx) => {
     if(!utils.isAdmin(ctx.senderId)){return ctx.send(`❗ Нет доступа!`);};
     let message = `👥 Объявление для админов\n`;
     let members = JSON.parse(fs.readFileSync('./dbs/server-db/admins.json'));
