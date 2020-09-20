@@ -506,6 +506,7 @@ setInterval(async () => {
         war_message += `👥 Онлайн: ${online}\n`;
         war_message += `✊🏻 Участвуем в боях!`;
         return vk.api.messages.send({
+            peer_id: cfg.group.peerId,
             message: war_message,
             keyboard: Keyboard.keyboard([
                 Keyboard.textButton({label: 'Бой', color: "positive"})
