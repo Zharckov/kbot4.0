@@ -461,7 +461,7 @@ setInterval(async () => {
     message += `❤ Не забудь подписаться на нашу группу!\n`;
     message += `👀 Там ты информацию о боте, новости клана, промокоды!\n`;
     message += `🔔 Чтобы не пропустить ничего важного, включай уведомление о новых записях!`;
-    return vk.api.messages.send({
+    vk.api.messages.send({
         peer_id: cfg.group.peerId,
         message: message,
         keyboard: Keyboard.keyboard([
@@ -472,4 +472,48 @@ setInterval(async () => {
     }).catch((error) => {
         logger.warn(`Напоминание не отправлено! Причина: ${error.message}`, 'vk');
     });
+    
+    let battles = JSON.parse(fs.readFileSync('./dbs/vk-db/battles.json'));
+    if(!battles[time().format('DD.MM.YYYY')]){
+        return 1;
+    } else {
+        let war_message = ``;
+        let members = await vk.api.messages.getConversationMembers({
+            peer_id: cfg.group.peerId
+        });
+        let users = JSON.parse(fs.readFileSync('./dbs/vk-db/users.json'));
+        let online = 0;
+        let date = time().format('DD.MM.YYYY');
+        for(let i = 0; i < members.profiles.length; i++){
+            let user = utils.findOBJ(users, 'id', members.profiles[i].id);
+            if(user){
+                let battlesGlobal = JSON.parse(fs.readFileSync('./dbs/vk-db/battles.json'));
+                let today = utils.findOBJ(battlesGlobal[date].users, 'nick', user.el.nick);
+                if(today){
+                    if(today.el.norm < battlesGlobal[date].norm){
+                        war_message += `[${members.profiles[i].screen_name}|&#8203;]`;
+                    }
+                } else {
+                    war_message += `[${members.profiles[i].screen_name}|&#8203;]`;
+                }
+            } else {
+                war_message += `[${members.profiles[i].screen_name}|&#8203;]`;
+            }
+            if(members.profiles[i].online){
+                online++
+            }
+        }
+        war_message += `👥 Онлайн: ${online}\n`;
+        war_message += `✊🏻 Участвуем в боях!`;
+        return vk.api.messages.send({
+            message: war_message,
+            keyboard: Keyboard.keyboard([
+                Keyboard.textButton({label: 'Бой', color: "positive"})
+            ]).inline(true)
+        }).catch((error) => {
+            return logger.error(`Ошибка отправки сообщения о боях: ${error.message}`);
+        }).then(() => {
+            return logger.log(`Отпрвалено сообщение о боях!`);
+        });
+    }
 }, 1000 * 60 * 60);
