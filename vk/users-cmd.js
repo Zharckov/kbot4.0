@@ -166,11 +166,11 @@ vk.updates.hear(/^\/top( )?([0-9\.]{10})?( )?(all|win|lose)?/i, (ctx) => {
     let date = ctx.$match[2] || time().format('DD.MM.YYYY');
     let dateMSG = (ctx.$match[2]) ? ctx.$match[2] : 'сегодня';
     let sortType = ctx.$match[4] || false;
-    if(!battlesGlobal[date]){
-        return ctx.send(`🌌 Не найдено боёв за ${dateMSG}!`);
-    }
-    let { users, all, win, lose, norm} = battlesGlobal[date];
     if(sortType){
+        if(!battlesGlobal[date]){
+            return ctx.send(`🌌 Не найдено боёв за ${dateMSG}!`);
+        }
+        let { users, all, win, lose, norm} = battlesGlobal[date];
         switch(sortType){
             case 'all': { 
                 let message = `[🌌] Топ игроков за ${dateMSG} по боям:\n\n`;
@@ -217,16 +217,33 @@ vk.updates.hear(/^\/top( )?([0-9\.]{10})?( )?(all|win|lose)?/i, (ctx) => {
         }
         return 1;
     } else {
-        let message = `[🌀] Топ игроков за ${dateMSG} по боям:\n\n`;
-        let sort = users.sort((a, b) => {
+        let message = `[🌀] Топ игроков за все время по боям:\n\n`;
+        let battleDates = Object.keys(battlesGlobal);
+        let players = [];
+        for(let i = 0; i < battleDates.length; i++){
+            let { users } = battlesGlobal[battleDates[i]];
+            for(let j = 0; j < users.length; j++){
+                let element = utils.findOBJ(players, 'nick', users[j].nick);
+                if(element){
+                    players[element.ind].all += users[j].all;
+                } else {
+                    players.push({
+                        nick: users[j].nick,
+                        all: users[j].all
+                    });
+                }
+            }
+        }
+        players.sort((a, b) => {
             return b.all - a.all;
         });
-        let sortLength = (sort.length > 5) ? 5 : sort.length;
-        for(let i = 0; i < sortLength; i++){  
-            if(i <= 2) 
-                message += `[⚔] ${sort[i].nick} - ${sort[i].all}\n`;
-            else 
-                message += `[🗡] ${sort[i].nick} - ${sort[i].all}\n`;
+        let topLength = (players.length > 10) ? 10 : players.length;
+        for(let i = 0; i < topLength; i++){
+            if(i <= 4){
+                message += `⚔ ${players[i].nick} - ${players[i].all}\n`;
+            } else {
+                message += `🗡 ${players[i].nick} - ${players[i].all}\n`;
+            }
         }
         return ctx.send(message);
     }

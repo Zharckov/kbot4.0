@@ -302,7 +302,7 @@ async function lesyaHandler(ctx){
                 }],
                 win: (result == 'Победа') ? 1 : 0,
                 lose: (result == 'Победа') ? 0 : 1,
-                all: 1
+                all: 0
             });
             if(result == 'Победа'){
                 battles[date].win++;

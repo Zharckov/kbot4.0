@@ -55,6 +55,15 @@ function delAdmin(id){
     }
 }
 
+function addNewDataToUsers(path, name, value){
+    let data = JSON.parse(fs.readFileSync(path));
+    for(let i = 0; i < data.length; i++){
+        data[i][name] = value;
+    }
+    return fs.writeFileSync(path, JSON.stringify(data, '', 4));
+}
+
 module.exports = {
-    findOBJ, formatUptime, isAdmin, addAdmin, delAdmin
+    findOBJ, formatUptime, isAdmin, addAdmin, delAdmin,
+    addNewDataToUsers
 }
