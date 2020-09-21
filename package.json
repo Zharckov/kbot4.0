@@ -23,6 +23,8 @@
   "dependencies": {
     "countdown": "^2.6.0",
     "moment": "^2.27.0",
+    "request": "^2.88.2",
+    "sharp": "^0.26.1",
     "socket.io": "^2.3.0",
     "vk-io": "^4.0.0-rc.30"
   }

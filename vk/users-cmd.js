@@ -2,9 +2,12 @@ const { vk, logger, cfg } = require('./vk');
 const fs = require('fs');
 const time = require('moment');
 const countdown = require('countdown');
+const sharp = require('sharp');
+const rp = require('request');
 
 let ARRAY_CMD = require('../dbs/vk-db/cmds.json');
 const utils = require('../modules/utils');
+const { Buffer } = require('buffer');
 let STRING_CMD = `🌌 Команды бота [${ARRAY_CMD.length}]:\n`;
 for(let i = 0; i < ARRAY_CMD.length; i++){
     STRING_CMD += `> ${ARRAY_CMD[i]}\n`;
@@ -327,4 +330,44 @@ vk.updates.hear(/^\/promo/i, (ctx) => {
 vk.updates.hear(/^\/history/i, (ctx) => {
     let history = fs.readFileSync('./dbs/vk-db/story.txt', {encoding: 'utf8'});
     return ctx.send(history);
+});
+
+vk.updates.hear(/^\/edit/i, (ctx) => {
+    let users = JSON.parse(fs.readFileSync('./dbs/vk-db/users.json'));
+    let user = utils.findOBJ(users, 'id', ctx.senderId);
+    if(!user){return ctx.send(`❗ Вы не зарегистрованны!`);}
+    if(!ctx.hasAttachments('photo')){return ctx.send(`❗ Вы не прикрепили фото к сообщению!`);}
+    if(ctx.attachments.length > 1){return ctx.send(`❗ Нельзя прикреплять более 1 изображения!`);}
+    try{
+        rp.get(ctx.attachments[0].largePhoto, { encoding: 'binary'}, async (err, res, body) => {
+            if(err){ return ctx.send(`❗ Ошибка получения изображения! Попробуйте еще раз!`);}
+            if(res.statusCode != 200){ return ctx.send(`❗ Ошибка получения изображения! Попробуйте еще раз!`);}
+            fs.writeFileSync(`./temp/${ctx.senderId}.jpg`, new Buffer.from(body, 'binary'), {encoding: 'binary'});
+
+            let file = fs.readFileSync(`./temp/${ctx.senderId}.jpg`);
+
+            // await sharp(file).blur(5).toFile(`./temp/${ctx.senderId}.jpg`);
+            // file = fs.readFileSync(`./temp/${ctx.senderId}.jpg`);
+
+            // await sharp(file).tint(0x000000).toFile(`./temp/${ctx.senderId}.jpg`);
+            // file = fs.readFileSync(`./temp/${ctx.senderId}.jpg`);
+            await sharp(file).gamma(2).toFile(`./temp/${ctx.senderId}.jpg`);
+            file = fs.readFileSync(`./temp/${ctx.senderId}.jpg`);
+
+            await sharp(file).sharpen(10).toFile(`./temp/${ctx.senderId}.jpg`);
+            file = fs.readFileSync(`./temp/${ctx.senderId}.jpg`);
+
+            let image = await vk.upload.messagePhoto({
+                peer_id: ctx.peerId, 
+                source: `./temp/${ctx.senderId}.jpg`
+            });
+            await ctx.send(`Я обработал твое фото!`, {
+                attachment: image.toString()
+            });
+            return fs.unlinkSync(`./temp/${ctx.senderId}.jpg`);
+        });
+    } catch(error){
+        logger.error(`Обработка фото. Ошибка: ${error.message}`);
+        return ctx.send(`❗ Произошла ошибка получения изображения! Попробуйте ещё раз!`);
+    }
 });
